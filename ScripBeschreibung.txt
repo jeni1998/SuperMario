@@ -1,0 +1,137 @@
+anim:	nimmt die Klasse/Komponente Animator vom Objekt welches der Script enthalten ist. 
+	selbe prinzip wie bei Rigidbody nur hier wird der Animator genommen.
+
+Move():		
+//Bewegen	-Getaxis:	Von Unity vorgegeben "Horizontal"/"Vertical" x und y Achse. 
+				Tastenbelegung kann man selber anpassen.	
+				Der Wert liegt für die Eingabe von Tastatur im Bereich -1/ 1, dieser Wert wird dann mit dem
+		 		MoveSpeed Multipliziert um die Schnelligkeit anzupassen. Dies wird in MoveX gespeichert.
+		-rb2d.velocity: Lineare Geschwindigkeit des Objektes, welche in demfall auf der X-Achse.
+				-Vector2 wird verwendet um die Positionen darzustellen (x, y).
+		-anim.SetFloat:	SetFloat wird verwendet, um Float-Werte an den Animator zu senden,
+				um Übergänge zu aktivieren. So wird als beispiel die Werte übergeben, damit der
+				Animator weiss ob er jetzt läuft oder rennt. es gibt auch weiter wie SetBool, SetInteger usw.
+				Im Animator muss man dann die Werte definieren, welche die Animationen beinflussen dürfen.
+
+//Springen:	GetButtonDown("Jump") Jump ist von Unity als Name vorgegeben und den Input kann man ebenfalls
+		anpassen.
+		
+Jump():		rb2d.velocity: Hier wird diesmal für die y-Achse verwendet.
+		Grouded: wird auf false gesetzt damit er in der luft kein doppelsprung machen kann.
+		SetBool: selbes Prinzip wie bei SetFloat nur als Bool-Wert.
+
+FlipPlayer():	Diese Funktion wechselt lediglich nur das Image/sprite unseres Player.
+		Ansonsten hätte man vom Player die Images doppelt bzw für links und rechts nehmen müssen und auch
+		doppelte Animationen erstellen müssen.
+		Vector2 Localscale: Dort wird die aktuelle position des Players verwendet und wird dann auf -1/+1
+				    gesetzt um ihn zu drehen.
+		Transform: Bekommt jedes Objekt in Unity, diese beinhaltet Position, Drehung und Skalierung.
+
+OnCollisionEnter:-Wird gesendet, wenn ein ankommender Collider mit dem Collider dieses Objekts
+		  in Kontakt kommt. Dort kann man codieren was passieren soll wenn die zusammenstoßen.
+		  Informationen werden über den übergebenen Parameter angegeben. 
+		  hier wird das andere Objekt geprüft, ob die Collider des Player mit den anderen
+		  Collider vom Objekt, welches ein tag hat (GroundColl), zusammenstößt.
+		  ist das der fall wird Ground auf true gesetzt und der Spieler kann wieder springen.
+
+		 -Im nächsten schritt wird nach dem Namen des anderen Objektes gesucht, falls diese zusammenstoßen
+		  verliert dieser Spieler.
+		 -SceneManager: hilft von Scene zu Scene zu wechseln.
+
+OnTriggerEnter:	  macht das selbe wie CollisionEnter, nur das die anderen Collider auf Trigger gestellt wurden.
+		  Trigger bedeutet, dass man da durch laufen oder drinne stehen kann im anderen Collider,
+		  da gibt es keine "Wand" die den Spieler dann dagegen laufen lässt und ihn dadurch stoppen könnte.
+		
+		 -Hier werden die Tags von den Coins benutzt um den Coin zu zerstören sobald unser Player mit den coins
+		  in berührung kommt. So stellt es da das diese dann aufgesammelt wurden.
+		  Das selbe prinzip hat auch die Coins die vom Fragezeichen kommen, diese werden dann aber erst nach einer
+		  Sekunde Zerstört.
+
+/////////////////////////////////////////
+BetterJump():	 
+
+		-Time.deltaTime: Ist Die Fertigstellungszeit in Sekunden seit dem letzten Frame. Multipliziert man
+		 das mit dem fallmultiplikator und den vector2.up so macht es eine bewegung in yRichtung.
+		 also nEinheiten (fallmultiplikator) * Vector2.up (y-Richtung) * Time.DeltaTime.
+		-die Physik2D.gravity.y ist für die Gravitation in y Richtung, diese wird hinzugefügt um das
+		 fallen Schöner zu machen.
+		 Geprüft wird hier ob die y richtung höher oder kleiner null wird um dann dementsprechend das spring
+		 und fallverhältnis zu bestimmen.
+
+/////////////////////////////////////////////////////////////////////////////
+MovementENbr(): vector2.left ist eine kurze schreibweise von "new vector2(-1,0)" welche in userDirection eingepspeicher wrid
+		In der Update Funktion wird durch transform.translate der Braune Pilz nach links bewegt.
+
+MovementRocket(): Die updatefunktion ist die selbe wie bei dem Braunen Pilz (MovementENBr).
+		  Hier kommt noch dazu, dass wenn der spieler auf die Rakete drauf springt, die Rakete zerstört wird.
+
+/////////////////////////////////////////////////////////////////////////////
+
+DestroyEnemy(): -Hier wird Das image von dem gegner (Pilz/EnemyBR) gewechselt, wenn er stirbt in das SterbeImage.
+		 Die Klasse/komponente Sprite ist für das Image welches er wechseln soll und ist auf SerializedField,
+		 damit wir das Image über die Oberfläche rein machen können.
+		-Ein Edge Collider ist ein Strich Collider, da wir schon andere verwendet haben benutzen wir deisen,
+		 damit der Player auch den Pilz zerstören kann.
+		-OnCollisionEnter: wird geschaut ob sich der der Spieler sich mit dem gegner berührt.
+		 ist dies der Fall wird OnCollision auf true gesetzt.
+		-In OnCollisionEnter wird dann geschaut ob der Player mit diesem "Strich-Collider" treffen.
+		 ist dies der fall wird OnTrigger auf true gesetzt.
+		-Update(): hier wird jetzt geprüft ob sich beide Collider treffen wenn das der Fall ist wird
+		 dem Pilz das Image übergeben, um zu verdeutlichen das dieser zerstört wurde.
+		-ist das nicht der Fall und nur der normale Collider berührt wird und nicht der TriggerCollider,
+		 so bekommt man den Screen, dass man verloren hat. (wechselt zur scene GameOver)
+
+//////////////////////////////////////////////////////////////////////////////
+
+
+Fragezeichen():	-Hier wird ebenfalls die Klasse/Komponente von Sprite verwendet um ihn später dann das
+		 leere Fragezeichen zu übergeben.
+		-OnTriggerEnter: Collidiert der Player mit dem Fragezeichen wird berührt auf true gesetzt.
+		-In der Updatefunktion wird dann abegefragt ob berührt true oder false ist, ist es true, dann
+		 wird das Fragezeichen geändert und die Animation wird gestoppt.
+
+//////////////////////////////////////////////////////////////////////////////
+
+CameraFollow(): Transform soll dein GameObjekt über Unity übergeben werden, dort haben wir den Hintergrund rein gemacht,
+		damit sich die Camera auf den Hintergrund fokosiert.
+		in Update wird in der Camera Position, die Position des Background gespeichert.
+
+MoveBackground(): Hier wird der Background auf der X-Achse nach rechts verschoben. Selbe funktion wie im Script
+		  MovementENbr, nur das der Background statt links nach rechts geht.
+
+//////////////////////////////////////////////////////////////////////////////
+SceneLoader():  -Der Sceneloader wird für die Scenen in Unity verwendet, um diese zu wechseln (Bsp. von Level 1 zu Level 2)
+		 LoadNextScene: -currentSceneIndex wird die aktuele Szene übertragen mit buildIndex, welche über Unity
+		 erstmal erstellt werden muss. Dort kann man dann auswählen welche Szene nummer 0, 1 ,2... bekommen soll.
+		 LoadScene: Soll die aktuele + 1 also die nächste Szene öffnen.
+		-QuitGame:Wenn nach Beendigung des Programms die Anwendung erstellt wird, schließt Sie.
+		-Dieser Script wird in den Buttons eingefügt um dann die erste Szene zu laden. Später dann auch
+		 am ziel, damit die nächste Szene geladen wird.
+
+//////////////////////////////////////////////////////////////////////////////
+
+CoinScore():	Zählt die Coins hoch und übergibt es dem TextMeshProGUI welches wir über der Engine reingezogen
+		habe.
+		TextMeshPro ist eine UI die dauernd sichtbar über die Kamera ist, damit kann man Menüs erstellen
+		und/oder wie in diesem falle, zeigen wie hoch der Score ist.
+
+coins():	Sobald der Player mit dem Coin Collidiert wird der Score hoch gezählt, danach der Spriterenderer
+		(besitzt den Sprite für den Coin) auf true gesetzt, damit er sichtbar wird (Dient nur für Coins die über das
+		Fragezeichen sind, da diese von anfang aus gestellt sind damit man die nicht sieht) und der
+		CapsuleCollider auf false damit er nicht den Score mehrmals hoch zählt da er ihn ja immernoch berührt.
+
+
+
+
+
+
+
+
+
+		
+
+
+
+	
+	
+	
